@@ -20,7 +20,7 @@ gridExtra::grid.arrange(p1, p2, p3)
 
 Part of what we explain in this section are the assumptions that permit us to extract the trend from the noise.
 
-**To understand why we cover this topic, remember that the concepts behind smoothing techniques are extremely useful in machine learning because conditional expectations/probabilities can be thought of as _trends_ of unknown shapes that we need to estimate in the presence of uncertainty.** 
+To understand why we cover this topic, remember that the concepts behind smoothing techniques are extremely useful in machine learning because conditional expectations/probabilities can be thought of as _trends_ of unknown shapes that we need to estimate in the presence of uncertainty.
 
 To explain these concepts, we will focus first on a problem with just one predictor. Specifically, we try to estimate the time trend in the 2008 US popular vote poll margin (difference between Obama and McCain). 
 
@@ -488,6 +488,7 @@ with $X_1$ and $X_2$ the two predictors defined in Section \@ref(two-or-seven). 
 
 ```{r, eval=FALSE}
 library(tidyverse)
+library(lubridate)
 library(purrr)
 library(pdftools)
 library(dslabs)
@@ -508,7 +509,7 @@ dat <- map_df(str_split(pdf_text(fn), "\n"), function(s){
     str_split_fixed("\\s+", n = 6) %>% .[,1:5] %>% as_tibble() %>% 
     setNames(c("day", header)) %>%
     mutate(month = month, day = as.numeric(day)) %>%
-    gather(year, deaths, -c(day, month)) %>%
+    pivot_longer(-c(day, month), names_to = "year", values_to = "deaths") %>%
     mutate(deaths = as.numeric(deaths))
 }) %>%
   mutate(month = recode(month, 

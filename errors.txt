@@ -1,4 +1,4 @@
-
+big change not recorded: all gather/spread were changed to pivot_longer/pivot_wider
 Preface, Page xxvii 
 
 Zofia Gajdos instead of Zzofia Gajdos
@@ -326,6 +326,58 @@ get_slope <- function(x, y) cor(x, y) / (sd(x) * sd(y))
 Should be
 get_slope <- function(x, y) cor(x, y) * sd(y) / sd(x)
 
+307 in pdf
+
+$2*\bar{X}-1 = 0.04$ 
+should be
+$2\bar{X}-1 = 0.04$ 
+
+page 314 in pdf
+
+b. These are not t-tests so the connection between p-value and confidence intervals does not apply.
+
+should be
+
+b. These are based on t-statistics so the connection between p-value and confidence intervals does not apply.
+
+page 346 in pdf
+
+Change
+
+$$
+Z = \frac{\bar{X} - d}{s/\sqrt{N}}
+$$
+
+to 
+
+
+$$
+t = \frac{\bar{X} - d}{s/\sqrt{N}}
+$$
+
+
+Add a sentence.
+
+By substituting $\sigma$ with $s$ we introduce some variability.
+
+should be 
+
+This is referred to a _t-statistic_. By substituting $\sigma$ with $s$ we introduce some variability.
+
+
+The theory tells us that $Z$ follows a t-distribution with $N-1$ _degrees of freedom_. 
+
+should be 
+
+The theory tells us that $t$ follows a t-distribution with $N-1$ _degrees of freedom_. 
+
+
+then $Z$ follows a _student t-distribution_ with $N-1$ degrees of freedom. So perhaps a better confidence interval for $d$ is:
+
+should be
+
+then $t$ follows a t-distribution with $N-1$ degrees of freedom. So perhaps a better confidence interval for $d$ is:
+
 
 Page 344, 372 in pdf
 
@@ -415,6 +467,15 @@ over interpret should be over-interpret
 three common ways should be four common ways
 
 
+page 384
+
+Add 
+
+Using the t-distribution and the t-statistic is the basis for _t-tests_, widely used approach for computing p-values. To learn more about t-tests, you can consult any statistics textbook.
+
+right before:
+
+The t-distribution can also be used to model errors
 
 Page 391, 419 in pdf
 
@@ -475,6 +536,42 @@ Page 485, 513 in pdf
 If the outcomes are binary, both RMSE and MSE are equivalent to accuracy, since  
 Should be
 If the outcomes are binary, both RMSE and MSE are equivalent to one minus accuracy, since  
+
+page 484
+
+Turn data frame to tibble. Change
+
+Now we are now ready to extract the words for all our tweets. 
+
+
+```{r}
+campaign_tweets <- trump_tweets %>% 
+  extract(source, "source", "Twitter for (.*)") %>%
+  filter(source %in% c("Android", "iPhone") &
+           created_at >= ymd("2015-06-17") & 
+           created_at < ymd("2016-11-08")) %>%
+  filter(!is_retweet) %>%
+  arrange(created_at)
+```
+
+to
+
+
+```{r}
+campaign_tweets <- trump_tweets %>% 
+  extract(source, "source", "Twitter for (.*)") %>%
+  filter(source %in% c("Android", "iPhone") &
+           created_at >= ymd("2015-06-17") & 
+           created_at < ymd("2016-11-08")) %>%
+  filter(!is_retweet) %>%
+  arrange(created_at) %>% 
+  as_tibble()
+```
+
+page 485
+
+remove ds_theme_set()
+
 
 Page 538, 566 in pdf
 
@@ -540,6 +637,70 @@ y_hat <- fit$coef[1] + fit$coef[2]*test_set$father
 sqrt(mean((y_hat - test_set$son)^2))
 ```
 
+page 561 in pdf
+
+
+To illustrate logistic regression, we will apply it to our previous predicting sex example:
+to
+To illustrate logistic regression, we will apply it to our previous predicting sex example defined in Section \@ref(training-test).
+
+Change unseen code from
+library(dslabs)
+data("heights")
+
+y <- heights$height
+set.seed(2)
+test_index <- createDataPartition(y, times = 1, p = 0.5, list = FALSE)
+train_set <- heights %>% slice(-test_index)
+test_set <- heights %>% slice(test_index)
+
+
+to
+
+data(heights)
+
+y <- heights$sex
+
+set.seed(2007)
+test_index <- createDataPartition(y, times = 1, p = 0.5, list = FALSE)
+test_set <- heights[test_index, ]
+train_set <- heights[-test_index, ]
+
+
+In confusion-matrix.Rmd change 
+### Training and test sets 
+to
+### Training and test sets {#training-test}
+
+change 
+
+filter(round(height)==66) %>%
+
+filter(round(height)  == 66) %>%
+
+
+change
+confusionMatrix(y_hat, test_set$sex)[["Accuracy"]]
+to
+confusionMatrix(y_hat, test_set$sex)$overall[["Accuracy"]]
+
+
+change
+The function $\beta_0 + \beta_1 x$ can take any value including negatives and values larger than 1. In fact, the estimate $\hat{p}(x)$ computed in the linear regression section does indeed become negative at around 76 inches.
+to
+The function $\beta_0 + \beta_1 x$ can take any value including negatives and values larger than 1. In fact, the estimate $\hat{p}(x)$ computed in the linear regression section does indeed become negative.
+
+change
+
+confusionMatrix(y_hat_logit, test_set$sex)[["Accuracy"]]
+to
+confusionMatrix(y_hat_logit, test_set$sex)$overall[["Accuracy"]]
+
+change
+```{r glm-prediction}
+to
+```{r glm-prediction, echo = FALSE}
+
 page 587 in pdf
 
 sum of square
@@ -604,18 +765,100 @@ plot_cond_prob <- function(p_hat=NULL){
   stat_contour(breaks=c(0.5),color="black")
 }
 ```
+page 604 in pdf
+
+Change:
+
+The accuracy is almost 0.95!
+```{r}
+y_hat_knn <- predict(fit_knn, x_test[, col_index], type="class")
+cm <- confusionMatrix(y_hat_knn, factor(y_test))
+cm$overall["Accuracy"]
+```
+
+We now achieve an accuracy of about 0.95. 
+
+to
+
+We now achieve a high accuracy:
+```{r}
+y_hat_knn <- predict(fit_knn, x_test[, col_index], type="class")
+cm <- confusionMatrix(y_hat_knn, factor(y_test))
+cm$overall["Accuracy"]
+```
+
+page 605 
+
+to make compilation faster
+
+change
+
+
+```{r mnist-rf, message=FALSE, warning=FALSE, cache=TRUE}
+library(randomForest)
+control <- trainControl(method="cv", number = 5)
+grid <- data.frame(mtry = c(1, 5, 10, 25, 50, 100))
+
+train_rf <-  train(x[, col_index], y, 
+                   method = "rf", 
+                   ntree = 150,
+                   trControl = control,
+                   tuneGrid = grid,
+                   nSamp = 5000)
+
+ggplot(train_rf)
+train_rf$bestTune
+```
+
+Now that we have optimized our algorithm, we are ready to fit our final model:
+
+```{r, cache=TRUE}
+fit_rf <- randomForest(x[, col_index], y, 
+                       minNode = train_rf$bestTune$mtry)
+```
+
+To check that we ran enough trees we can use the plot function:
+
+```{r, eval=FALSE}
+plot(fit_rf)
+```
+
+
+
+to
+
 
 page 637
 
-The predictors for each observation are measured on the same device and experimental procedure. This introduces biases that can affect all the predictors from one observation. For each observation, compute the average across all predictors and then plot this against the first PC with color representing tissue. Report the correlation.
-should be
+Change
+"The predictors for each observation are measured on the same device and experimental procedure. This introduces biases that can affect all the predictors from one observation. For each observation, compute the average across all predictors and then plot this against the first PC with color representing tissue. Report the correlation.
+should be"
 
-The predictors for each observation are measured on the same measurement device (a gene expression microarray) after an experimental procedure. A different device and procedure is used for each observation. This may introduce biases that affect all predictors for each observation in the same way. To explore the effect of this potential bias, for each observation, compute the average across all predictors and then plot this against the first PC with color representing tissue. Report the correlation.
+to 
+
+"The predictors for each observation are measured on the same measurement device (a gene expression microarray) after an experimental procedure. A different device and procedure is used for each observation. This may introduce biases that affect all predictors for each observation in the same way. To explore the effect of this potential bias, for each observation, compute the average across all predictors and then plot this against the first PC with color representing tissue. Report the correlation."
 
 Page 667, 695 in pdf
 
 Remove sentence "We have already shown how we can do this with RStudio."
 
+page 656
+
+### Factors analysis 
+
+Should be 
+
+## Factor analysis {#factor-analysis} 
+
+
+page 656
+
+Add the following
+"Note that `p` and `q` are equivalent to the patterns and weights we described in Section \@ref(pca).""
+
+after 
+
+"is that we can almost reconstruct $r$, which has 60 values, with a couple of vectors totaling 17 values.""
 716 in pdf
 
 ```{r echo=FALSE}
@@ -741,6 +984,27 @@ should be
 $$
 r_{u,i} = p_{u,1} q_{1,i} + p_{u,2} q_{2,i} + \dots + p_{u,n} q_{n,i} 
 $$
+
+
+page 669 in pdf
+
+change
+
+To interpret this graph we do the following. To find the distance between any two movies, find the first location from top to bottom that the movies split into two different groups. The height of this location is the distance between the groups. So the distance between the _Star Wars_ movies is 8 or less, while the distance between _Raiders of the Lost of Ark_ and _Silence of the Lambs_ is about 17. 
+
+to
+
+
+This graph gives us an approximation between the distance between any two movies. To find this distance we find the first location, from top to bottom, where these movies split into two different groups. The height of this location is the distance between these two groups. So, for example, the distance between the three _Star Wars_ movies is 8 or less, while the distance between _Raiders of the Lost of Ark_ and _Silence of the Lambs_ is about 17.
+
+page 703 in pdf
+
+ the staging and working directory areas,
+ 
+
+to 
+
+staging area and working directory
 
 
 NEED to FIX JSON PART. Search for citi_bike
